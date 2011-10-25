@@ -9,7 +9,7 @@ public class Statechart {
 	private String name;
 	public boolean statechartIsInitialized = false;
 	private State initialState = null;
-	private State currentState = null;
+	State currentState = null;
 	
 	List<State> createStateChain = new ArrayList<State>();
 	List<State> destroyStateChain = new ArrayList<State>();
@@ -37,6 +37,10 @@ public class Statechart {
 			initialState = rootState;
 			rootState.enterState();
 			currentState = initialState;
+			
+			while (currentState.getInitialState() != null) {
+				gotoState(currentState.getInitialState());
+			}
 		}
 	}
 	
@@ -44,6 +48,12 @@ public class Statechart {
 		createStateChain.clear();
 		destroyStateChain.clear();
 		
+		currentState = performGotoState(stateName);
+		
+		return currentState;
+	}
+
+	private State performGotoState(String stateName) {
 		if (currentState.getName().equals(stateName)) {
 			//No transitions, return currentState
 			return currentState;
@@ -77,6 +87,9 @@ public class Statechart {
 			return null;
 		}
 		
+		while (currentState.getInitialState() != null) {
+			performGotoState(currentState.getInitialState());
+		}
 		
 		return currentState;
 	}

@@ -10,11 +10,23 @@ public class State {
 	private Map<String, StateAction> actionMap = new HashMap<String, StateAction>();
 	private List<State> substates = new ArrayList<State>();
 	private State parentState;
-	private boolean substatesIsConcurrent = false;
+	private boolean substatesAreConcurrent = false;
+	private String initialState;
 	
 	public State(State parentState, String stateName, StateAction enterStateAction, StateAction exitStateAction) {
 		this.parentState = parentState;
 		this.name = stateName;
+		
+		setEnterStateAction(enterStateAction);
+		setExitStateAction(exitStateAction);
+	}
+	
+	public State(State parentState, String stateName, StateAction enterStateAction, StateAction exitStateAction, List<State> substates, String initialSubstate, boolean substatesAreConcurrent) {
+		this.parentState = parentState;
+		this.name = stateName;
+		this.substates = substates;
+		this.initialState = initialSubstate;
+		this.substatesAreConcurrent = substatesAreConcurrent;
 		
 		setEnterStateAction(enterStateAction);
 		setExitStateAction(exitStateAction);
@@ -56,8 +68,32 @@ public class State {
 		sendEvent("exitState");
 	}
 	
-	public void setSubstatesIsConcurrent(boolean substatesIsConcurrent) {
-		this.substatesIsConcurrent = substatesIsConcurrent;
+	public void setSubstatesAreConcurrent(boolean substatesAreConcurrent) {
+		this.substatesAreConcurrent = substatesAreConcurrent;
+	}
+	
+	public void setInitialState(String initialState) {
+		this.initialState = initialState;
+	}
+	
+	public String getInitialState() {
+		if (initialState == null || initialState.length() == 0) {
+			return null;
+		}
+		boolean hasInitialState = false;
+		
+		for (State substate : substates) {
+			if (initialState.equals(substate.getName())) {
+				hasInitialState = true;
+				break;
+			}
+		}
+		
+		if (!hasInitialState) {
+			initialState = null;
+		}
+		
+		return initialState;
 	}
 	
 	public State addState(State state) {
