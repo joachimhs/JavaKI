@@ -34,7 +34,7 @@ public class Statechart {
 		if (!statechartIsInitialized) {
 			statechartIsInitialized = true;
 			if (rootState == null) {
-				rootState = new State(null, "rootState", null, null);
+				rootState = new State( "rootState", null, null);
 			}
 			
 			initialState = rootState;
@@ -78,9 +78,11 @@ public class Statechart {
 			//stateName is a substate of currentState, no destroy needed
 			
 			//Go to the targetState (substateOfCurrent), and traverse back upwards the parent chain until the current node is reached. 
-			List<State> reversedOrderStates = getNodesFromSourceToParent(stateName, substateOfCurrent, currentState);
+			List<State> reversedOrderStates =  getNodesFromSourceToParent(stateName, substateOfCurrent, currentState);
 			Collections.reverse(reversedOrderStates);
-			createStateChain.addAll(reversedOrderStates);
+			
+			recursielyAddInitialOrConcurrentStates(reversedOrderStates);
+			
 			currentState = substateOfCurrent;
 		} else if (parentOfCurrent != null) {
 			//stateName is a parent of currentState, no create needed
@@ -107,7 +109,9 @@ public class Statechart {
 			for (int i = concurrentStates.size() - 1; i >= 0; i--) {
 				State concurrentSubstate = concurrentStates.get(i);
 				currentState = concurrentSubstate;
-				createStateChain.add(currentState);
+				if (!createStateChain.contains(currentState)) {
+					createStateChain.add(currentState);
+				}
 				performGotoState(concurrentSubstate.getName());
 			}
 		}
@@ -118,6 +122,19 @@ public class Statechart {
 		
 		
 		return currentState;
+	}
+
+	private void recursielyAddInitialOrConcurrentStates(List<State> statesToAddToCreateChain) {
+		for (State stateToCreate : statesToAddToCreateChain) {
+			if (!createStateChain.contains(stateToCreate)) {
+				createStateChain.add(stateToCreate);
+				for (State initialOrConcurrentSubstateToCreate : stateToCreate.getAllInitialSubstates()) {
+					if (!createStateChain.contains(initialOrConcurrentSubstateToCreate)) {
+						createStateChain.add(initialOrConcurrentSubstateToCreate);
+					}
+				}
+			}
+		}
 	}
 
 	private void traverseBetweenTreeBranches(String stateName,
@@ -162,7 +179,7 @@ public class Statechart {
 		
 		List<State> reversedOrderStates = getNodesFromSourceToParent(stateName, differentBranchState, commonRootState);
 		Collections.reverse(reversedOrderStates);
-		createStateChain.addAll(reversedOrderStates);
+		recursielyAddInitialOrConcurrentStates(reversedOrderStates);
 		currentState = differentBranchState;
 	}
 

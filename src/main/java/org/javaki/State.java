@@ -15,16 +15,14 @@ public class State {
 	private String initialState;
 	private List<State> enteredSubstates = new ArrayList<State>();
 	
-	public State(State parentState, String stateName, StateAction enterStateAction, StateAction exitStateAction) {
-		this.parentState = parentState;
+	public State(String stateName, StateAction enterStateAction, StateAction exitStateAction) {
 		this.name = stateName;
 		
 		setEnterStateAction(enterStateAction);
 		setExitStateAction(exitStateAction);
 	}
 	
-	public State(State parentState, String stateName, StateAction enterStateAction, StateAction exitStateAction, List<State> substates, String initialSubstate, boolean substatesAreConcurrent) {
-		this.parentState = parentState;
+	public State(String stateName, StateAction enterStateAction, StateAction exitStateAction, List<State> substates, String initialSubstate, boolean substatesAreConcurrent) {
 		this.name = stateName;
 		this.substates = substates;
 		this.initialState = initialSubstate;
@@ -34,16 +32,12 @@ public class State {
 		setExitStateAction(exitStateAction);
 	}
 	
-	public State(String stateName, StateAction enterStateAction, StateAction exitStateAction) {
-		this(null, stateName, enterStateAction, exitStateAction);
-	}
-	
 	public State(State parentState, String stateName) {
-		this(parentState, stateName, null, null);
+		this(stateName, null, null);
 	}
 	
 	public State(String stateName) {
-		this(null, stateName, null, null);
+		this(stateName, null, null);
 	}
 	
 	public void setParentState(State parentState) {
@@ -143,11 +137,34 @@ public class State {
 	private void performGetAllEnteredSubstates(List<State> allEnteredSubstates, State sourceState) {
 		if (sourceState.hasEnteredSubstates()) {
 			for (State enteredSubstate : sourceState.getEnteredSubstates()) {
-				allEnteredSubstates.add(enteredSubstate);
+				if (!allEnteredSubstates.contains(enteredSubstate)) {
+					allEnteredSubstates.add(enteredSubstate);
+				}
 				performGetAllEnteredSubstates(allEnteredSubstates, enteredSubstate);
 			}
 		} else {
 			return;
+		}
+	}
+	
+	public List<State> getAllInitialSubstates() {
+		List<State> allInitialSubstates = new ArrayList<State>();
+		
+		performGetAllInitialSubstates(allInitialSubstates, this);
+		
+		return allInitialSubstates;
+	}
+	
+	private void performGetAllInitialSubstates(List<State> allInitialSubstates, State sourceState) {
+		State initialState = sourceState.getSubstate(sourceState.getInitialState());
+		if (initialState != null) {
+			allInitialSubstates.add(initialState);
+			performGetAllInitialSubstates(allInitialSubstates, initialState);
+		} else if (sourceState.isSubstatesAreConcurrent()) { 
+			for (State concurrentSubstate : sourceState.getSubstates()) {
+				allInitialSubstates.add(concurrentSubstate);
+				performGetAllEnteredSubstates(allInitialSubstates, concurrentSubstate);
+			}
 		}
 	}
 	
