@@ -24,7 +24,10 @@ public class Statechart {
 	}
 	
 	public void sendEvent(String eventName) {
-		
+		List<State> allEnteredStates = rootState.getAllEnteredSubstates();
+		for (State enteredState : allEnteredStates) {
+			enteredState.sendEvent(eventName);
+		}
 	}
 	
 	public void initializeStatechart() {
