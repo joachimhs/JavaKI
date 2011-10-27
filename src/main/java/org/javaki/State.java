@@ -1,6 +1,7 @@
 package org.javaki;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ public class State {
 	private State parentState;
 	private boolean substatesAreConcurrent = false;
 	private String initialState;
+	private List<State> enteredSubstates = new ArrayList<State>();
 	
 	public State(State parentState, String stateName, StateAction enterStateAction, StateAction exitStateAction) {
 		this.parentState = parentState;
@@ -62,14 +64,28 @@ public class State {
 	
 	public void enterState() {
 		sendEvent("enterState");
+		if (parentState != null) {
+			parentState.addEnteredSubstate(this);
+		}
 	}
 	
 	public void exitState() {
 		sendEvent("exitState");
+		if (parentState != null) {
+			parentState.removeEnteredSubstate(this);
+		}
 	}
 	
 	public void setSubstatesAreConcurrent(boolean substatesAreConcurrent) {
 		this.substatesAreConcurrent = substatesAreConcurrent;
+	}
+	
+	public boolean isSubstatesAreConcurrent() {
+		return substatesAreConcurrent;
+	}
+	
+	public boolean hasEnteredSubstates() {
+		return enteredSubstates.size() > 0;
 	}
 	
 	public void setInitialState(String initialState) {
@@ -102,8 +118,41 @@ public class State {
 		return state;
 	}
 	
+	public void addEnteredSubstate(State enteredSubstate) {
+		if (substates.contains(enteredSubstate) && !enteredSubstates.contains(enteredSubstate)) {
+			enteredSubstates.add(enteredSubstate);
+		}
+	}
+	
+	public void removeEnteredSubstate(State enteredSubstate) {
+		
+	}
+	
 	public boolean hasSubstates() {
 		return substates.size() > 0;
+	}
+	
+	public List<State> getAllEnteredSubstates() {
+		List<State> allEnteredSubstates = new ArrayList<State>();
+		
+		performGetAllEnteredSubstates(allEnteredSubstates, this);
+		Collections.reverse(allEnteredSubstates);
+		return allEnteredSubstates;
+	}
+	
+	private void performGetAllEnteredSubstates(List<State> allEnteredSubstates, State sourceState) {
+		if (sourceState.hasEnteredSubstates()) {
+			for (State enteredSubstate : sourceState.getEnteredSubstates()) {
+				allEnteredSubstates.add(enteredSubstate);
+				performGetAllEnteredSubstates(allEnteredSubstates, enteredSubstate);
+			}
+		} else {
+			return;
+		}
+	}
+	
+	public List<State> getEnteredSubstates() {
+		return enteredSubstates;
 	}
  	
 	public void addAction(String actionName, StateAction stateAction) {

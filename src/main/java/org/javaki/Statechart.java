@@ -50,6 +50,14 @@ public class Statechart {
 		
 		currentState = performGotoState(stateName);
 		
+		for (State enterState : createStateChain) {
+			enterState.enterState();
+		}
+		
+		for (State exitState : destroyStateChain) {
+			exitState.exitState();
+		}
+		
 		return currentState;
 	}
 
@@ -74,7 +82,10 @@ public class Statechart {
 		} else if (parentOfCurrent != null) {
 			//stateName is a parent of currentState, no create needed
 			//Add path from current to parentOfCurrent destroyStateChain
-			destroyStateChain.addAll(getNodesFromSourceToParent(stateName, currentState, parentOfCurrent));
+			List<State> statesToDestroy = parentOfCurrent.getAllEnteredSubstates();
+			for (State stateToDestroy : statesToDestroy) {
+				destroyStateChain.add(stateToDestroy);
+			} 
 			currentState = parentOfCurrent;
 		} else if (differentBranchState != null) {
 			//stateName is part of the tree, but not in the current branch.
@@ -85,11 +96,23 @@ public class Statechart {
 			//TODO: Add path from first common root node to stateName to createStateChain
 		} else {
 			return null;
+		}	
+		
+		while (currentState.isSubstatesAreConcurrent() && currentState.getSubstates().size() > 0) {
+			List<State> concurrentStates = currentState.getSubstates();
+			//Traverse backwards, so that the left-most substate will be the active state
+			for (int i = concurrentStates.size() - 1; i >= 0; i--) {
+				State concurrentSubstate = concurrentStates.get(i);
+				currentState = concurrentSubstate;
+				createStateChain.add(currentState);
+				performGotoState(concurrentSubstate.getName());
+			}
 		}
 		
 		while (currentState.getInitialState() != null) {
 			performGotoState(currentState.getInitialState());
 		}
+		
 		
 		return currentState;
 	}
@@ -114,12 +137,26 @@ public class Statechart {
 			if (commonRootState != null) {
 				break;
 			}
-			destroyStateChain.add(fromBranchState);
 		}
 		
+		State nodeToExitFrom = commonRootState;
 		if (commonRootState == null) {
 			commonRootState = rootState;
+			//IF the common root state is the root state, we want to exit all of the states from the branch we ae leaving
+			//bot not the rootstate itself
+			nodeToExitFrom = currentToRootPath.get(currentToRootPath.size() - 1);
 		}
+		
+		for (State stateToDestroy : nodeToExitFrom.getAllEnteredSubstates()) {
+			destroyStateChain.add(stateToDestroy);
+		}
+		
+		//If the common root state is the root state, we want to also exit the last node form the currentToRootPath list
+		if (commonRootState == rootState) {
+			destroyStateChain.add(nodeToExitFrom);
+		}
+		
+		
 		List<State> reversedOrderStates = getNodesFromSourceToParent(stateName, differentBranchState, commonRootState);
 		Collections.reverse(reversedOrderStates);
 		createStateChain.addAll(reversedOrderStates);

@@ -25,6 +25,7 @@ public class StateTraversalTest {
 		b.setInitialState("I");
 		State c = rootState.addState(new State("C"));
 		c.setInitialState("M");
+		State r = rootState.addState(new State("R"));
 		
 		//Second level
 		State d = a.addState(new State("D"));
@@ -32,7 +33,7 @@ public class StateTraversalTest {
 		State f = a.addState(new State("F"));
 		f.setInitialState("G");
 		State i = b.addState(new State("I"));
-		i.setInitialState("J");
+		i.setSubstatesAreConcurrent(true);
 		m = c.addState(new State(c, "M"));
 		m.setInitialState("N");
 		
@@ -64,7 +65,7 @@ public class StateTraversalTest {
 	public void verify_that_statechart_can_traverse_to_state() {
 		State actual = statechart.gotoState("G");
 		Assert.assertNotNull("Expecting a state", actual);
-		Assert.assertEquals("Expecting state H because it is the intitial substate og G", "H", actual.getName());
+		Assert.assertEquals("Expecting state H because it is the intitial substate of G", "H", actual.getName());
 		
 		actual = statechart.gotoState("H");
 		Assert.assertNotNull("Expecting a state", actual);
@@ -196,6 +197,7 @@ public class StateTraversalTest {
 		Assert.assertTrue("Expecting a non-empty createStateChain", statechart.createStateChain.size() > 0);
 		Assert.assertEquals("Expecting 1 elements in createStateChain", new Integer(1), new Integer(statechart.createStateChain.size()) );
 		Assert.assertEquals("Expecting that the 1st element in createStateChain is Q", "Q", statechart.createStateChain.get(0).getName());
+		Assert.assertEquals("Expecting that the current State is Q", "Q", statechart.currentState.getName());
 		
 		statechart.gotoState("P");
 		Assert.assertTrue("Expecting en ikke-tom destroyStateChain", statechart.destroyStateChain.size() > 0);
@@ -208,17 +210,20 @@ public class StateTraversalTest {
 		
 		statechart.gotoState("I");
 		Assert.assertTrue("Expecting en ikke-tom destroyStateChain", statechart.destroyStateChain.size() > 0);
-		Assert.assertEquals("Expecting 4 elements in destroyStateChain",  new Integer(4), new Integer(statechart.destroyStateChain.size()));
+		Assert.assertEquals("Expecting 6 elements in destroyStateChain",  new Integer(6), new Integer(statechart.destroyStateChain.size()));
 		Assert.assertEquals("Expecting that the 1st element in destroyStateChain is P", "P", statechart.destroyStateChain.get(0).getName());
-		Assert.assertEquals("Expecting that the 2nd element in destroyStateChain is N", "N", statechart.destroyStateChain.get(1).getName());
-		Assert.assertEquals("Expecting that the 3rd element in destroyStateChain is M", "M", statechart.destroyStateChain.get(2).getName());
-		Assert.assertEquals("Expecting that the 4th element in destroyStateChain is C", "C", statechart.destroyStateChain.get(3).getName());
+		Assert.assertEquals("Expecting that the 2nd element in destroyStateChain is Q", "Q", statechart.destroyStateChain.get(1).getName());
+		Assert.assertEquals("Expecting that the 3rd element in destroyStateChain is O", "O", statechart.destroyStateChain.get(2).getName());
+		Assert.assertEquals("Expecting that the 4th element in destroyStateChain is N", "N", statechart.destroyStateChain.get(3).getName());
+		Assert.assertEquals("Expecting that the 5th element in destroyStateChain is M", "M", statechart.destroyStateChain.get(4).getName());
+		Assert.assertEquals("Expecting that the 6th element in destroyStateChain is C", "C", statechart.destroyStateChain.get(5).getName());
 		Assert.assertTrue("Expecting en ikke-tom createStateChain", statechart.createStateChain.size() > 0);
-		Assert.assertEquals("Expecting 4 elements in createStateChain",  new Integer(4), new Integer(statechart.createStateChain.size()));
+		Assert.assertEquals("Expecting 5 elements in createStateChain",  new Integer(5), new Integer(statechart.createStateChain.size()));
 		Assert.assertEquals("Expecting that the 1st element in createStateChain is B", "B", statechart.createStateChain.get(0).getName());
 		Assert.assertEquals("Expecting that the 2nd element in createStateChain is I", "I", statechart.createStateChain.get(1).getName());
-		Assert.assertEquals("Expecting that the 3rd element in createStateChain is J", "J", statechart.createStateChain.get(2).getName());
-		Assert.assertEquals("Expecting that the 4th element in createStateChain is L", "L", statechart.createStateChain.get(3).getName());
+		Assert.assertEquals("Expecting that the 3rd element in createStateChain is K", "K", statechart.createStateChain.get(2).getName());
+		Assert.assertEquals("Expecting that the 4th element in createStateChain is J", "J", statechart.createStateChain.get(3).getName());
+		Assert.assertEquals("Expecting that the 5th element in createStateChain is L", "L", statechart.createStateChain.get(4).getName());
 	}
 	
 	@Test
@@ -236,12 +241,13 @@ public class StateTraversalTest {
 		Assert.assertEquals("Expecting that the 1st element in createStateChain is P", "P", statechart.createStateChain.get(0).getName());
 		
 		statechart.gotoState("K");
-		Assert.assertTrue("Expecting en ikke-tom destroyStateChain", statechart.destroyStateChain.size() > 0);
-		Assert.assertEquals("Expecting 4 elements in destroyStateChain",  new Integer(4), new Integer(statechart.destroyStateChain.size()));
+		Assert.assertEquals("Expecting 6 elements in destroyStateChain",  new Integer(6), new Integer(statechart.destroyStateChain.size()));
 		Assert.assertEquals("Expecting that the 1st element in destroyStateChain is P", "P", statechart.destroyStateChain.get(0).getName());
-		Assert.assertEquals("Expecting that the 2nd element in destroyStateChain is N", "N", statechart.destroyStateChain.get(1).getName());
-		Assert.assertEquals("Expecting that the 3rd element in destroyStateChain is M", "M", statechart.destroyStateChain.get(2).getName());
-		Assert.assertEquals("Expecting that the 4 element in destroyStateChain is C", "C", statechart.destroyStateChain.get(3).getName());
+		Assert.assertEquals("Expecting that the 2nd element in destroyStateChain is Q", "Q", statechart.destroyStateChain.get(1).getName());
+		Assert.assertEquals("Expecting that the 3rd element in destroyStateChain is O", "O", statechart.destroyStateChain.get(2).getName());
+		Assert.assertEquals("Expecting that the 4th element in destroyStateChain is N", "N", statechart.destroyStateChain.get(3).getName());
+		Assert.assertEquals("Expecting that the 5th element in destroyStateChain is M", "M", statechart.destroyStateChain.get(4).getName());
+		Assert.assertEquals("Expecting that the 6th element in destroyStateChain is C", "C", statechart.destroyStateChain.get(5).getName());
 		
 		Assert.assertTrue("Expecting en ikke-tom createStateChain", statechart.createStateChain.size() > 0);
 		Assert.assertEquals("Expecting 3 elements in createStateChain",  new Integer(3), new Integer(statechart.createStateChain.size()));
@@ -264,4 +270,33 @@ public class StateTraversalTest {
 	public void verify_that_initialize_statechart_adheres_to_initial_state_declarations() {
 		Assert.assertEquals("Expecting that the initial current stat is H", "H", statechart.currentState.getName());
 	}
+	
+	@Test
+	public void verify_that_all_concurrent_substates_are_entered() {
+		statechart.gotoState("I");
+		Assert.assertTrue("Expecting en ikke-tom createStateChain", statechart.createStateChain.size() > 0);
+		Assert.assertEquals("Expecting 5 elements in createStateChain",  new Integer(5), new Integer(statechart.createStateChain.size()));
+		Assert.assertEquals("Expecting that the 1st element in createStateChain is B", "B", statechart.createStateChain.get(0).getName());
+		Assert.assertEquals("Expecting that the 2nd element in createStateChain is I", "I", statechart.createStateChain.get(1).getName());
+		Assert.assertEquals("Expecting that the 3rd element in createStateChain is K", "K", statechart.createStateChain.get(2).getName());
+		Assert.assertEquals("Expecting that the 4th element in createStateChain is J", "J", statechart.createStateChain.get(3).getName());
+		Assert.assertEquals("Expecting that the 5th element in createStateChain is L", "L", statechart.createStateChain.get(4).getName());
+		
+		Assert.assertEquals("Expecting that the current state is L", "L", statechart.currentState.getName());
+	}
+	
+	@Test
+	public void verify_that_all_concurrent_substates_are_exited_when_parent_is_exited() {
+		verify_that_all_concurrent_substates_are_entered();
+		
+		statechart.gotoState("R");
+		Assert.assertTrue("Expecting en ikke-tom destroyStateChain", statechart.destroyStateChain.size() > 0);
+		Assert.assertEquals("Expecting 5 elements in destroyStateChain",  new Integer(5), new Integer(statechart.destroyStateChain.size()));
+		Assert.assertEquals("Expecting that the 1st element in destroyStateChain is L", "L", statechart.destroyStateChain.get(0).getName());
+		Assert.assertEquals("Expecting that the 2nd element in destroyStateChain is J", "J", statechart.destroyStateChain.get(1).getName());
+		Assert.assertEquals("Expecting that the 3rd element in destroyStateChain is K", "K", statechart.destroyStateChain.get(2).getName());
+		Assert.assertEquals("Expecting that the 4th element in destroyStateChain is I", "I", statechart.destroyStateChain.get(3).getName());
+		Assert.assertEquals("Expecting that the 5th element in destroyStateChain is B", "B", statechart.destroyStateChain.get(4).getName());
+	}
+	
 }
