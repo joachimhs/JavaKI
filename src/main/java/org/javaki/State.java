@@ -118,8 +118,10 @@ public class State {
 		}
 	}
 	
-	public void removeEnteredSubstate(State enteredSubstate) {
-		
+	public void removeEnteredSubstate(State stateToExit) {
+		if (substates.contains(stateToExit) && enteredSubstates.contains(stateToExit)) {
+			enteredSubstates.remove(stateToExit);
+		}
 	}
 	
 	public boolean hasSubstates() {
@@ -225,5 +227,10 @@ public class State {
 	
 	public List<State> getSubstates() {
 		return substates;
+	}
+	
+	@Override
+	public String toString() {
+		return name;
 	}
 }

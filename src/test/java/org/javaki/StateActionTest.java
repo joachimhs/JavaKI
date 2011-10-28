@@ -89,8 +89,8 @@ public class StateActionTest {
 		Assert.assertEquals("Expecting 5 entered states", new Integer(5), new Integer(statesEntered.size()));
 		Assert.assertEquals("Expecting that the 1st element in statesEntered is B", "B", statesEntered.get(0));
 		Assert.assertEquals("Expecting that the 2nd element in statesEntered is I", "I", statesEntered.get(1));
-		Assert.assertEquals("Expecting that the 3rd element in statesEntered is K", "K", statesEntered.get(2));
-		Assert.assertEquals("Expecting that the 4th element in statesEntered is J", "J", statesEntered.get(3));
+		Assert.assertEquals("Expecting that the 3rd element in statesEntered is J", "J", statesEntered.get(2));
+		Assert.assertEquals("Expecting that the 4th element in statesEntered is K", "K", statesEntered.get(3));
 		Assert.assertEquals("Expecting that the 5th element in statesEntered is L", "L", statesEntered.get(4));
 	}
 	
