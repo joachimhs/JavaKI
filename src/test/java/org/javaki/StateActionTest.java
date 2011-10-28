@@ -90,8 +90,8 @@ public class StateActionTest {
 		Assert.assertEquals("Expecting that the 1st element in statesEntered is B", "B", statesEntered.get(0));
 		Assert.assertEquals("Expecting that the 2nd element in statesEntered is I", "I", statesEntered.get(1));
 		Assert.assertEquals("Expecting that the 3rd element in statesEntered is J", "J", statesEntered.get(2));
-		Assert.assertEquals("Expecting that the 4th element in statesEntered is K", "K", statesEntered.get(3));
-		Assert.assertEquals("Expecting that the 5th element in statesEntered is L", "L", statesEntered.get(4));
+		Assert.assertEquals("Expecting that the 4th element in statesEntered is L", "L", statesEntered.get(3));
+		Assert.assertEquals("Expecting that the 5th element in statesEntered is K", "K", statesEntered.get(4));
 	}
 	
 	@Test
@@ -129,6 +129,30 @@ public class StateActionTest {
 		
 	}
 	
+	@Test
+	public void verify_that_actions_are_called_when_event_is_sent_to_active_states() {
+		CountCallsAction calls = new CountCallsAction();
+		m.addAction("count", calls);
+		
+		statechart.gotoState("M");
+		statechart.sendEvent("count");
+		
+		Assert.assertEquals("Expecting the 'count' action to be called exaclty once", new Integer(1), new Integer(calls.getNumCalls()));
+		
+		statechart.sendEvent("count");
+		Assert.assertEquals("Expecting the 'count' action to be called exaclty twice", new Integer(2), new Integer(calls.getNumCalls()));
+	}
+	
+	@Test
+	public void verify_that_action_is_not_called_when_state_is_inactive() {
+		CountCallsAction calls = new CountCallsAction();
+		m.addAction("count", calls);
+		
+		statechart.sendEvent("count");
+		
+		Assert.assertEquals("Expecting the 'count' action to never have been called", new Integer(0), new Integer(calls.getNumCalls()));
+	}
+	
 	public class RecordStateEntryAction implements StateAction {
 		private String stateName;
 		
@@ -150,6 +174,18 @@ public class StateActionTest {
 
 		public void invokeAction() {
 			statesExited.add(stateName);
+		}
+	}
+	
+	public class CountCallsAction implements StateAction {
+		int numCalls = 0;
+		
+		public void invokeAction() {
+			numCalls++;
+		}
+		
+		public int getNumCalls() {
+			return numCalls;
 		}
 	}
 }
