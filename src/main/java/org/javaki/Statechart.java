@@ -51,19 +51,23 @@ public class Statechart {
 		createStateChain.clear();
 		destroyStateChain.clear();
 
-		currentState = performGotoState(stateName);
+		if (currentState.getName().equals(stateName)) {
+			//No transitions
+		} else {
+			currentState = performGotoState(stateName);
 
-		for (State enterState : createStateChain) {
-			enterState.enterState();
-			if (destroyStateChain.contains(enterState)) {
-				destroyStateChain.remove(enterState);
+			for (State enterState : createStateChain) {
+				enterState.enterState();
+				if (destroyStateChain.contains(enterState)) {
+					destroyStateChain.remove(enterState);
+				}
+			}
+	
+			for (State exitState : destroyStateChain) {
+				exitState.exitState();
 			}
 		}
-
-		for (State exitState : destroyStateChain) {
-			exitState.exitState();
-		}
-
+		
 		return currentState;
 	}
 

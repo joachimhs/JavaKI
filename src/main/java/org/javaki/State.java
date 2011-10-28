@@ -165,7 +165,7 @@ public class State {
 		} else if (sourceState.isSubstatesAreConcurrent()) { 
 			for (State concurrentSubstate : sourceState.getSubstates()) {
 				allInitialSubstates.add(concurrentSubstate);
-				performGetAllEnteredSubstates(allInitialSubstates, concurrentSubstate);
+				performGetAllInitialSubstates(allInitialSubstates, concurrentSubstate);
 			}
 		}
 	}
