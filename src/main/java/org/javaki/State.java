@@ -178,10 +178,13 @@ public class State {
 		this.actionMap.put(actionName, stateAction);
 	}
 	
-	public void sendEvent(String eventName) {
+	public String sendEvent(String eventName) {
+		String returnState = null;
 		if (actionMap.containsKey(eventName)) {
-			actionMap.get(eventName).invokeAction();
+			returnState = actionMap.get(eventName).invokeAction();
 		}
+		
+		return returnState;
 	}
 	
 	public State getSubstate(String stateName) {

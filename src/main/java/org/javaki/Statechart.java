@@ -24,9 +24,18 @@ public class Statechart {
 	}
 
 	public void sendEvent(String eventName) {
+		List<String> statesToGoTo = new ArrayList<String>();
+		
 		List<State> allEnteredStates = rootState.getAllEnteredSubstates();
 		for (State enteredState : allEnteredStates) {
-			enteredState.sendEvent(eventName);
+			String stateToGoTo = enteredState.sendEvent(eventName);
+			if (stateToGoTo != null) {
+				statesToGoTo.add(stateToGoTo);
+			}
+		}
+		
+		for (String stateToGoTo : statesToGoTo) {
+			this.gotoState(stateToGoTo);
 		}
 	}
 

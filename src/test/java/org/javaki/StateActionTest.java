@@ -160,8 +160,9 @@ public class StateActionTest {
 			this.stateName = stateName;
 		}
 		
-		public void invokeAction() {
+		public String invokeAction() {
 			statesEntered.add(stateName);
+			return null;
 		}
 	}
 	
@@ -172,16 +173,18 @@ public class StateActionTest {
 			this.stateName = stateName;
 		}
 
-		public void invokeAction() {
+		public String invokeAction() {
 			statesExited.add(stateName);
+			return null;
 		}
 	}
 	
 	public class CountCallsAction implements StateAction {
 		int numCalls = 0;
 		
-		public void invokeAction() {
+		public String invokeAction() {
 			numCalls++;
+			return null;
 		}
 		
 		public int getNumCalls() {
