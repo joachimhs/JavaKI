@@ -61,7 +61,8 @@ public class Statechart {
 		destroyStateChain.clear();
 
 		if (currentState.getName().equals(stateName)) {
-			//No transitions
+			//No transitions, invoke the enterState action
+			currentState.enterState();
 		} else {
 			currentState = performGotoState(stateName);
 
