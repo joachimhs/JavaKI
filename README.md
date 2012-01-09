@@ -64,7 +64,7 @@ import javax.swing.UIManager;
 
 import org.javaki.StateAction;
 
-import com.akvaplan.exec.SenseEra;
+import com.myapp.MyApplicatoon;
 
 public class InitializeMainFrameAction implements StateAction {
  private MyApplication gui;
