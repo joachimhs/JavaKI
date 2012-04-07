@@ -60,24 +60,24 @@ public class Statechart {
 		createStateChain.clear();
 		destroyStateChain.clear();
 
-		if (currentState.getName().equals(stateName)) {
-			//No transitions, invoke the enterState action
-			currentState.enterState();
-		} else {
-			currentState = performGotoState(stateName);
+        currentState = performGotoState(stateName);
 
-			for (State enterState : createStateChain) {
-				enterState.enterState();
-				if (destroyStateChain.contains(enterState)) {
-					destroyStateChain.remove(enterState);
-				}
-			}
-	
-			for (State exitState : destroyStateChain) {
-				exitState.exitState();
-			}
-		}
-		
+        for (State enterState : createStateChain) {
+            enterState.enterState();
+            if (destroyStateChain.contains(enterState)) {
+                destroyStateChain.remove(enterState);
+            }
+        }
+
+        for (State exitState : destroyStateChain) {
+            exitState.exitState();
+        }
+
+        if (createStateChain.size() == 0) {
+            //No enter transitions, invoke the enterState action for the current state
+            currentState.enterState();
+        }
+
 		return currentState;
 	}
 
